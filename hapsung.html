@@ -1,0 +1,170 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<title>CAPTCHA !</title>
+<style type="text/css">
+#wrapper{
+width:500px;
+margin: 0 auto;
+border:1px soild #000;
+}
+
+body {
+    font-family: 'Nanum Gothic';
+}
+main {
+    margin: 15px 0 15px 0;
+}
+main .container .row > div.col-lg-6 {
+    padding-left: 0;
+    padding-right: 0;
+}
+#mainCanvas {
+    max-width: 100%;
+}
+#btnDownload, #btnDownload:visited, #btnDownload:link, #btnDownload:active {
+    background-color: #5bc0de;
+    color: #fff;
+}
+#btnDownload:hover {
+    color: #cef;
+}
+footer {
+    margin:0;
+    padding:30px 0 30px 0;
+    width:100%;
+    background-color:#f3f3f3;
+    color:#000;
+}
+footer a:link, footer a:visited, footer a:hover, footer a:active, footer a:focus {
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+} 
+body{
+background-color : #FFFDF9;
+}
+</style>
+</head>
+<body>
+	
+	<main>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6 col-md-8 col-lg-6 col-xl-6">
+                        <canvas id="mainCanvas" width="394" height="570"></canvas>
+                </div>
+                <div id="setting" class="col-md-6 col-md-6 col-lg-6 col-xl-6" style="padding-left:5px;">
+                    <form id="form" runat="server">
+                    		<label for="txtBefore">이미지 업로드</label>
+						    <input type='file' id="imgInput" style=background-color:#eff7f9;/>
+						    <img id="image_section" src="#" width="0" height="0"/>
+                        <div class="form-group">
+                            <label for="txtBefore">상단 키워드</label>
+                            <input type="text" class="form-control" name="" placeholder="사람" id="txtBefore" value="사람">
+                        </div>
+                    </form>
+                        <a class="btn btn-download" id="btnDownload">
+                            <i class="fa fa-download"></i> 내려받기
+                        </a>
+                        
+                        <br><br><br>
+                        <p>
+                        	이미지를 업로드하고 텍스트를 입력하면 이미지가 나타납니다 !
+                        <p>	
+                        <br><br>
+                        <h2>지원 브라우저 : Explorer 11, Chrome 67, 안드로이드(삼성브라우저, 크롬)</h2>
+                        <h2>안드로이드(네이버 앱), 아이폰은 안됩니다..</h2>
+                        
+                        <br><br><br> <p>참고한 소스 : https://github.com/rajephon/gvsc/blob/gh-pages/index.html</p>
+                </div>
+            </div>
+        </div>
+    </main>
+	<script>
+	var beforPositionArr = [{x:30,y:55}];
+	var canvas = document.getElementById('mainCanvas');
+	var context = canvas.getContext('2d');
+	var imageObj = new Image();
+	var imageObj2 = new Image();
+	
+	var drawStroked = function drawStroked(ctx, text, x, y) {
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 0;
+        ctx.strokeText(text, x, y);
+        ctx.shadowColor = "transparent";
+        ctx.fillStyle = 'white';
+        ctx.fillText(text, x, y);
+    }
+    var fncAddKeyword = function addKeyword(ctx, txt, pos, color) {
+        ctx.shadowColor = '';
+        ctx.font = "15pt '돋음'";
+        ctx.lineWidth = 0;
+        drawStroked(ctx, txt, pos.x, pos.y);
+    }
+    $(function(){
+        $('#txtBefore').keyup(function(e){
+            var bf = $(this).val();
+            var bfSplit = bf.split();
+            var ctx = mainCanvas.getContext("2d");
+            ctx.shadowColor = "transparent";
+            ctx.drawImage(imageObj2, 0, 100, 392, 412);
+            ctx.drawImage(imageObj, 0, 0);
+            var length = Math.min(bfSplit.length, beforPositionArr.length);
+            for (var idx = 0; idx < length; idx++) {
+                fncAddKeyword(ctx, bfSplit[idx], beforPositionArr[idx]);
+            }
+        });
+        $('#btnDownload').click(function(){
+            var href = mainCanvas.toDataURL();
+            this.href = href;
+            this.download = "123.png";
+		});
+    });
+    
+    window.onload = function(){
+        var ctx = mainCanvas.getContext("2d");
+        ctx.fillStyle = "white";
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0; 
+        ctx.shadowBlur = 17;
+        ctx.textBaseline = 'alphabetic';
+        ctx.scale(1,1);
+    };
+    
+	imageObj.onload = function() {
+		$('#txtBefore').keyup();
+        $('#txtAfter').keyup();
+      };
+	 
+
+      function readURL(input) {
+    	  
+    	    if (input.files && input.files[0]) {
+    	        var reader = new FileReader();
+    	 
+    	        reader.onload = function (e) {
+    	            $('#image_section').attr('src', e.target.result);
+    	            imageObj2.src = $('#image_section').attr('src');
+    	        }
+    	 		
+    	        reader.readAsDataURL(input.files[0]);
+    	    }
+    	}
+    	 
+    	$("#imgInput").change(function(){
+    	    readURL(this);
+    	});
+    	
+	imageObj.src = 'https://drive.google.com/uc?id=1NcQHDbXsuwUubhQHVdNWkucLF9dBfnxV';
+
+	</script>
+	
+</body>
+</html>
